@@ -20,9 +20,19 @@ services:
       - 8006:8006
       - 3389:3389/tcp
       - 3389:3389/udp
+      - 5000:5000
+      - 5055:5055/udp
+      - 5155:5155/udp
+      - 843:843/tcp
+      - 843:843/udp
     volumes:
       - ./windows:/storage
-      - ./wwwroot:/inetpub/wwwroot
+      - ./shared:/shared
     restart: unless-stopped
     stop_grace_period: 2m
+    networks:
+      - my-net
 
+networks:
+  my-net:           # Define the custom network here
+    driver: bridge
