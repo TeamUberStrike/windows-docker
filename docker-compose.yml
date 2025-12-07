@@ -25,6 +25,7 @@ services:
       - 5155:5155/udp
       - 843:843/tcp
       - 843:843/udp
+      - 80:80
     volumes:
       - ./windows:/storage
       - ./shared:/shared
