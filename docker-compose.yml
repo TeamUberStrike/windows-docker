@@ -1,0 +1,39 @@
+services:
+  windows:
+    image: dockurr/windows
+    container_name: windows
+    environment:
+      VERSION: "2025"
+      RAM_SIZE: "16G"
+      CPU_CORES: "8"
+      DISK_SIZE: "128G"
+      USERNAME: "xaver"
+      PASSWORD: "root"
+      HOME: "${HOME}"
+      LANGUAGE: "English"
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8006:8006
+      - 3389:3389/tcp
+      - 3389:3389/udp
+      - 5000:5000
+      - 5055:5055/udp
+      - 5155:5155/udp
+      - 843:843/tcp
+      - 843:843/udp
+      - 80:80
+    volumes:
+      - ./windows:/storage
+      - ./shared:/shared
+    restart: unless-stopped
+    stop_grace_period: 2m
+    networks:
+      - my-net
+
+networks:
+  my-net:           # Define the custom network here
+    driver: bridge
