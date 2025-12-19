@@ -1,6 +1,6 @@
 services:
   windows:
-    image: dockurr/windows
+    image: dockurr/windows:5.14
     container_name: windows
     environment:
       VIRTUAL_HOST: ${VIRTUAL_HOSTS:-ws-dev.uberforever.eu}
@@ -36,7 +36,7 @@ services:
       - my-net
 
   nginx-proxy:
-    image: nginxproxy/nginx-proxy
+    image: nginxproxy/nginx-proxy:1.9.0
     container_name: nginx-proxy
     ports:
       - "80:80"
@@ -49,7 +49,7 @@ services:
       - my-net
 
   acme-companion:
-    image: nginxproxy/acme-companion
+    image: nginxproxy/acme-companion:2.6.2
     container_name: nginx-proxy-acme
     environment:
       - DEFAULT_EMAIL=xaver.max.gruber@googlemail.com
