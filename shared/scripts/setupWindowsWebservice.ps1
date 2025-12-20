@@ -14,19 +14,34 @@ Enable-WindowsOptionalFeature -Online -FeatureName `
 
 Install-WindowsFeature `
     Net-Framework-Core, `
-    IIS-ManagementConsole, `
     NET-HTTP-Activation, `
     NET-WCF-HTTP-Activation45
 
-# Create site directory
-$sitePath = "C:\production\Artifacts\UberStrike.DataCenter.WebService"
-New-Item -Path $sitePath -ItemType Directory -Force
+
+$sharedPath = Join-Path $env:USERPROFILE "Desktop\Shared\production"
+$productionPath = "C:\production"
+New-Item -Path $productionPath -ItemType Directory -Force
+
+if (Test-Path -Path $sharedPath -PathType Container) {
+    Copy-Item "$sharedPath\*" $productionPath -Recurse -Force
+}
+else {
+    Write-Error "Source directory does not exist: $sharedPath"
+    exit 1
+}
+
+$webservicePath = Join-Path $productionPath "Artifacts\UberStrike.DataCenter.WebService"
+if (-not (Test-Path $webservicePath)) {
+  Write-Error "webservice directory missing: $webservicePath"
+  exit 1
+}
+
 
 # Create app pool
 New-WebAppPool -Name "UberStrikeAppPool"
 
 # Create website
-New-Website -Name "UberStrikeWebService" -Port 80 -PhysicalPath $sitePath -ApplicationPool "UberStrikeAppPool"
+New-Website -Name "UberStrikeWebService" -Port 80 -PhysicalPath $webservicePath -ApplicationPool "UberStrikeAppPool"
 
 Stop-Website "Default Web Site"
 Start-Website -Name "UberStrikeWebService"
