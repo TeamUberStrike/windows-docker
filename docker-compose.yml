@@ -1,8 +1,10 @@
 services:
   windows:
-    image: dockurr/windows
+    image: dockurr/windows:5.14
     container_name: windows
     environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOSTS:-ws-dev.uberforever.eu}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOSTS:-ws-dev.uberforever.eu}
       VERSION: "2025"
       RAM_SIZE: "16G"
       CPU_CORES: "8"
@@ -20,12 +22,11 @@ services:
       - 8006:8006
       - 3389:3389/tcp
       - 3389:3389/udp
-      - 5000:5000
+      - 5000:80
       - 5055:5055/udp
       - 5155:5155/udp
       - 843:843/tcp
       - 843:843/udp
-      - 80:80
     volumes:
       - ./windows:/storage
       - ./shared:/shared
@@ -34,6 +35,38 @@ services:
     networks:
       - my-net
 
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.9.0
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - my-net
+
+  acme-companion:
+    image: nginxproxy/acme-companion:2.6.2
+    container_name: nginx-proxy-acme
+    environment:
+      - DEFAULT_EMAIL=xaver.max.gruber@googlemail.com
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - my-net
+
 networks:
-  my-net:           # Define the custom network here
+  my-net:
     driver: bridge
+  
+volumes:
+  html:
+  certs:
+  acme:
