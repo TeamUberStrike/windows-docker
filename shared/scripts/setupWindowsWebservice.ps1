@@ -44,6 +44,10 @@ if (Get-Website -Name $webserviceName -ErrorAction SilentlyContinue) {
     exit
 }
 
+if (Get-Website -Name "Default Web Site" -ErrorAction SilentlyContinue) {
+    Remove-Website -Name "Default Web Site"
+}
+
 # Create app pool
 New-WebAppPool -Name "UberStrikeAppPool"
 
