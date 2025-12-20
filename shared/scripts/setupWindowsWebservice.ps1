@@ -1,16 +1,17 @@
 # Install IIS with typical features + HTTP Activation
-Enable-WindowsOptionalFeature -Online -FeatureName `
-    IIS-WebServerRole, `
-    IIS-WebServer, `
-    IIS-CommonHttpFeatures, `
-    IIS-StaticContent, `
-    IIS-DefaultDocument, `
-    IIS-DirectoryBrowsing, `
-    IIS-HttpErrors, `
-    IIS-ApplicationDevelopment, `
-    IIS-ASPNET45, `
-    IIS-NetFxExtensibility45, `
-    IIS-ISAPIExtensions
+Enable-WindowsOptionalFeature -Online -FeatureName @(
+    "IIS-WebServerRole",
+    "IIS-WebServer",
+    "IIS-CommonHttpFeatures",
+    "IIS-StaticContent",
+    "IIS-DefaultDocument",
+    "IIS-DirectoryBrowsing",
+    "IIS-HttpErrors",
+    "IIS-ApplicationDevelopment",
+    "IIS-ASPNET45",
+    "IIS-NetFxExtensibility45",
+    "IIS-ISAPIExtensions"
+) -All
 
 Install-WindowsFeature `
     Net-Framework-Core, `
@@ -36,6 +37,12 @@ if (-not (Test-Path $webservicePath)) {
   exit 1
 }
 
+$webserviceName = "UberStrikeWebService"
+
+if (Get-Website -Name $webserviceName -ErrorAction SilentlyContinue) {
+    Write-Host "Website '$webserviceName' already exists. Exiting script."
+    exit
+}
 
 # Create app pool
 New-WebAppPool -Name "UberStrikeAppPool"
@@ -44,5 +51,5 @@ New-WebAppPool -Name "UberStrikeAppPool"
 New-Website -Name "UberStrikeWebService" -Port 80 -PhysicalPath $webservicePath -ApplicationPool "UberStrikeAppPool"
 
 Stop-Website "Default Web Site"
-Start-Website -Name "UberStrikeWebService"
+Start-Website -Name $webseriveName
 
