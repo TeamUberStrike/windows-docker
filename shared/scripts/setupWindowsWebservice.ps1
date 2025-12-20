@@ -54,6 +54,5 @@ New-WebAppPool -Name "UberStrikeAppPool"
 # Create website
 New-Website -Name "UberStrikeWebService" -Port 80 -PhysicalPath $webservicePath -ApplicationPool "UberStrikeAppPool"
 
-Stop-Website "Default Web Site"
 Start-Website -Name $webseriveName
 
