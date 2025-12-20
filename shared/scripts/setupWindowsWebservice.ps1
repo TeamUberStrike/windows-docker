@@ -12,7 +12,12 @@ Enable-WindowsOptionalFeature -Online -FeatureName `
     IIS-NetFxExtensibility45, `
     IIS-ISAPIExtensions
 
-Install-WindowsFeature Net-Framework-Core IIS-ManagementConsole
+Install-WindowsFeature `
+    Net-Framework-Core, `
+    IIS-ManagementConsole, `
+    NET-HTTP-Activation, `
+    NET-WCF-HTTP-Activation45
+
 # Create site directory
 $sitePath = "C:\production\Artifacts\UberStrike.DataCenter.WebService"
 New-Item -Path $sitePath -ItemType Directory -Force
