@@ -29,7 +29,8 @@ services:
       - 843:843/udp
     volumes:
       - ./windows:/storage
-      - ./shared:/shared
+      - ./shared/Artifacts:/shared
+      - ./shared/scripts:/oem
     restart: unless-stopped
     stop_grace_period: 2m
     networks:
