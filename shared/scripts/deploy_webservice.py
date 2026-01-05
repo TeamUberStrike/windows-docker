@@ -23,11 +23,11 @@ def main():
         #key_file="~/.ssh/id_rsa"  # or use password="secret"
     )
     
+    remote_deploy_path = "C:/production/"
     ssh.exec_command(
-        'powershell -Command "New-Item -ItemType Directory -Path C:\\production -Force"'
+        f'powershell -Command "New-Item -ItemType Directory -Path {remote_deploy_path} -Force"'
     )
    
-    remote_deploy_path = "C:/production/"
     with SCPClient(ssh.get_transport()) as scp:
        scp.put("setupWindowsWebservice.ps1", remote_deploy_path)
        scp.put("setupWindowsPorts.ps1", remote_deploy_path)
