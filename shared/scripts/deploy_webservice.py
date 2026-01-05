@@ -23,7 +23,6 @@ def main():
         user=user,
         password=password,
         port=port,
-        #key_file="~/.ssh/id_rsa"  # or use password="secret"
     )
 
 
