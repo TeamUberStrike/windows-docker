@@ -90,7 +90,7 @@ def parse_arguments():
 
 
 def establish_ssh_connection(host, user, password=None, key_file=None, port=22,
-    retries=5,
+    retries=3600,
     delay=5,
     timeout=10,
 ):
