@@ -1,14 +1,4 @@
-$sharedPath = Join-Path $env:USERPROFILE "Desktop\Shared\production"
 $productionPath = "C:\production"
-New-Item -Path $productionPath -ItemType Directory -Force
-
-if (Test-Path -Path $sharedPath -PathType Container) {
-    Copy-Item "$sharedPath\*" $productionPath -Recurse -Force
-}
-else {
-    Write-Error "Source directory does not exist: $sharedPath"
-    exit 1
-}
 
 $webservicePath = Join-Path $productionPath "Artifacts\UberStrike.DataCenter.WebService"
 if (-not (Test-Path $webservicePath)) {

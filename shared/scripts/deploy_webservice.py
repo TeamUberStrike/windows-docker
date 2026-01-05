@@ -59,7 +59,14 @@ def main():
         cmd = f'powershell -Command Rename-Item -Path "{remote_deploy_path}/{basename}" -NewName "Artifacts"'
         ssh.exec_command(cmd)
 
-    #ssh.exec_command("cd C:/production && setupWindowsPorts ")
+
+    setup_ports_command = f'cd {remote_deploy_path} && powershell -NoProfile -ExecutionPolicy Bypass -File "{remote_deploy_path}setupWindowsPorts.ps1"'
+    print(setup_ports_command)
+    ssh.exec_command(setup_ports_command)
+
+    setup_webservice_command = f'cd {remote_deploy_path} && powershell -NoProfile -ExecutionPolicy Bypass -File "{remote_deploy_path}setupWindowsWebservice.ps1"'
+    print(setup_webservice_command)
+    ssh.exec_command(setup_webservice_command)
     
     ssh.close()
 
