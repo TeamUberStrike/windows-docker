@@ -4,9 +4,12 @@ from dotenv import load_dotenv
 import os
 import argparse
 from urllib.parse import urlparse
+import time
+from paramiko.ssh_exception import SSHException, NoValidConnectionsError
 
 
 def main():
+    args = parse_arguments()
 
     load_dotenv()  # loads .env from current directory
     
@@ -22,6 +25,9 @@ def main():
         port=port,
         #key_file="~/.ssh/id_rsa"  # or use password="secret"
     )
+
+
+    test_ssh_connection(ssh)
     
     remote_deploy_path = "C:/production/"
     ssh.exec_command(
@@ -32,7 +38,6 @@ def main():
        scp.put("setupWindowsWebservice.ps1", remote_deploy_path)
        scp.put("setupWindowsPorts.ps1", remote_deploy_path)
    
-    args = parse_arguments()
 
     if args.path:
         path = os.path.expanduser(args.path)
@@ -67,7 +72,7 @@ def main():
     setup_webservice_command = f'cd {remote_deploy_path} && powershell -NoProfile -ExecutionPolicy Bypass -File "{remote_deploy_path}setupWindowsWebservice.ps1"'
     print(setup_webservice_command)
     ssh.exec_command(setup_webservice_command)
-    
+ 
     ssh.close()
 
 def parse_arguments():
@@ -100,6 +105,27 @@ def create_ssh_client(host, user, password=None, key_file=None, port=22):
         key_filename=key_file,
     )
     return client
+
+def test_ssh_connection(ssh,
+    retries=5,
+    delay=5,
+    timeout=10,
+):
+    last_exc = None
+
+    for attempt in range(1, retries + 1):
+        try:
+            stdin, stdout, stderr = ssh.exec_command("echo ok")
+            if stdout.read().strip() == b"ok":
+                print("SSH connection established...")
+                return
+
+        except (SSHException, NoValidConnectionsError, OSError) as e:
+            last_exc = e
+            print(f"SSH attempt {attempt}/{retries} failed: {e}")
+            time.sleep(delay)
+
+    raise RuntimeError("SSH not available after retries") from last_exc
 
 if __name__ == "__main__":
     main()
