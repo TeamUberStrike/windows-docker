@@ -18,16 +18,13 @@ def main():
     password = os.getenv("PASS")
     port = int(os.getenv("PORT", 22))
 
-    ssh = create_ssh_client(
+    ssh = establish_ssh_connection(
         host=host,
         user=user,
         password=password,
         port=port,
     )
 
-
-    test_ssh_connection(ssh)
-    
     remote_deploy_path = "C:/production/"
     ssh.exec_command(
         f'powershell -Command "New-Item -ItemType Directory -Path {remote_deploy_path} -Force"'
@@ -92,20 +89,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-
-def create_ssh_client(host, user, password=None, key_file=None, port=22):
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(
-        hostname=host,
-        username=user,
-        password=password,
-        port=port,
-        key_filename=key_file,
-    )
-    return client
-
-def test_ssh_connection(ssh,
+def establish_ssh_connection(host, user, password=None, key_file=None, port=22,
     retries=5,
     delay=5,
     timeout=10,
@@ -114,11 +98,20 @@ def test_ssh_connection(ssh,
 
     for attempt in range(1, retries + 1):
         try:
-            stdin, stdout, stderr = ssh.exec_command("echo ok")
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(
+                hostname=host,
+                username=user,
+                password=password,
+                port=port,
+                key_filename=key_file,
+            )
+            stdin, stdout, stderr = client.exec_command("echo ok")
             if stdout.read().strip() == b"ok":
                 print("SSH connection established...")
-                return
-
+                return client
+        
         except (SSHException, NoValidConnectionsError, OSError) as e:
             last_exc = e
             print(f"SSH attempt {attempt}/{retries} failed: {e}")
