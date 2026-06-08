@@ -37,3 +37,16 @@ curl <url_to_svc>
 ```
 docker restart nginx-proxy
 ```
+- check certificate
+```
+ openssl s_client \
+  -connect portal-dev.uberstrike.com:443 \
+  -servername portal-dev.uberstrike.com
+```
+- remove volumes
+```
+docker volume rm windows-nginx-test_html
+docker volume rm windows-nginx-test_certs
+docker volume rm windows-nginx-test_acme
+```
+
