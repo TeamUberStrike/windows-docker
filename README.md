@@ -33,3 +33,7 @@ docker logs <service_name>
 curl <url_to_svc> 
 ```
 
+- if the host is not resolved correctly
+```
+docker restart nginx-proxy
+```
